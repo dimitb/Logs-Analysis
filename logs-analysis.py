@@ -38,7 +38,7 @@ top_authors = (    # psql query to return the top authors
                        ON authors.id = articles.author) AS titlename
     WHERE log.path = '/article/' ||titlename.slug
     GROUP BY titlename.name
-    ORDER BY views desc;;
+    ORDER BY views desc;
     """
 )
 
