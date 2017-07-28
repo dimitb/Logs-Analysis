@@ -1,78 +1,91 @@
 #!/usr/bin/env python3
 import psycopg2
-import datetime
 
 
-top_3_stories = (
+top_stories = (    # psql query to return the top stories
     """
-    select articles.title, count(log.path) as views from articles, log
-    where log.path like '%'||articles.slug group by articles.title
-    order by views desc limit 3;
+    SELECT title, views
+    FROM articles
+    INNER JOIN
+        (SELECT path, count(path) AS views
+                       FROM log
+                       GROUP BY log.path) AS log
+    ON log.path = '/article/' || articles.slug
+    ORDER BY views desc limit 3;
     """
 )
 
 
 def get_top_stories():
+    """Return results for get_top_stories query."""
     db = psycopg2.connect("dbname=news")
     c = db.cursor()
-    query_1 = top_3_stories
-    c.execute(query_1)
+    c.execute(top_stories)
     story_rows = c.fetchall()
     print("The 3 Most Popular Stories Are:")
-    for row in story_rows:
-        print(row[0], "--", row[1], "views")
+    for title, views in story_rows:
+        print("\"{}\" -- {} views".format(title, views))
     db.close
 
 
-top_authors = (
+top_authors = (    # psql query to return the top authors
     """
-    select titlename.name, count(log.path) as views from log,
-    (select name, slug from authors join articles on
-    authors.id = articles.author) as titlename
-    where log.path like '%'||titlename.slug group by titlename.name
-    order by views desc;
+    SELECT titlename.name, count(path) AS views
+    FROM log,
+        (SELECT name, slug
+                       FROM authors
+                       JOIN articles
+                       ON authors.id = articles.author) AS titlename
+    WHERE log.path = '/article/' ||titlename.slug
+    GROUP BY titlename.name
+    ORDER BY views desc;;
     """
 )
 
 
 def get_top_authors():
+    """Return results from get_top_authors query."""
     db = psycopg2.connect("dbname=news")
     c = db.cursor()
-    query_2 = top_authors
-    c.execute(query_2)
+    c.execute(top_authors)
     author_rows = c.fetchall()
     print("The Most Popular Authors Are:")
-    for row in author_rows:
-        print(row[0], "--", row[1], "views")
+    for name, views in author_rows:
+        print("\"{}\" -- {} views".format(name, views))
     db.close()
 
 
-most_errors_day = (
+most_errors = (    # psql query to return the days with most errors
     """
-    select errors.day, cast(errors.total_errors as float) /
-    cast(views.total_views as float) * 100 as percent_errors from errors
-    join views on errors.day = views.day
-    order by percent_errors desc limit 1;
+    SELECT date, percent_errors
+    FROM (SELECT errors.day AS date, (cast(errors.total_errors AS float)
+            / cast(views.total_views AS float) * 100) AS percent_errors
+            FROM errors
+            JOIN views
+            ON errors.day = views.day) AS most_errors
+    GROUP BY most_errors.date, most_errors.percent_errors
+    HAVING SUM(percent_errors) >= 1.0
+    ORDER BY percent_errors desc;
     """
 )
 
 
-def get_most_errors_day():
+def get_days_errors_over_1_percent():
+    """Return the results for the get_days_errors_over_1_percent query."""
     db = psycopg2.connect("dbname=news")
     c = db.cursor()
-    query_3 = most_errors_day
-    c.execute(query_3)
+    c.execute(most_errors)
     errors_rows = c.fetchall()
     print("The Day with the Most Errors Was:")
     for row in errors_rows:
-        print(('{:%B %d, %Y}'.format(row[0])), "--",
-              ('{:02.2f}'.format(row[1])) + "%", 'errors')
+        print('{0:%B %d, %Y} -- {1:.2f}% errors'.format(row[0], row[1]))
     db.close()
 
 
-get_top_stories()
-print("")
-get_top_authors()
-print("")
-get_most_errors_day()
-print("")
+if __name__ == '__main__':  # Ensures each function runs only when called upon
+    get_top_stories()
+    print("")
+    get_top_authors()
+    print("")
+    get_days_errors_over_1_percent()
+    print("")
