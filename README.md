@@ -17,7 +17,7 @@
 >To ensure compatibility and the queries run as intended, please make sure you have the versions listed above, or better, installed.
 
 ### Installation/Creating the Database
->To create and connect to the news database to run the quries, download the _newsdata.zip_ file. The zip file contains a _vagrantfile_, which will create the news database and _newsdat.sql_, which contains the database schema and data.
+>To create and connect to the news database to run the quries, download the _newsdata.zip_ file. The zip file contains a _vagrantfile_, which will create the news database and _newsdata.sql_, which contains the database schema and data.
 >
 >Once downloaded, change to the **vagrant** directory from your terminal and start the virtual machine by running the command `vagrant up`. This will cause Vagrant to download the Linux operating system and install it.
 
