@@ -7,7 +7,21 @@
 - On which days did more than 1% of requests lead to errors?
 
 ### Getting Started
->The Logs Analysis project runs using the Python module _DB-API_ and was written using Python 3. To ensure compatibility, make sure you have the latest update of Python 3 installed on your system (Download Python [here](https://www.python.org/downloads/)).
+>The Logs Analysis project was written using Python and PSQL with a Vagrant configured VirtualBox vm. The following versions were used:
+- Python 3 - 3.6.1 [Download](https://www.python.org/downloads/)
+- psql (PostgreSQL) - 9.5.7 [Download](https://www.postgresql.org/download/)
+- pyscopg2 - 2.7.1 [Download](http://initd.org/psycopg/download/)
+- Vagrant - 1.9.7 [Download](https://www.vagrantup.com/downloads.html)
+- VirtualBox - 5.1.26 [Download](https://www.virtualbox.org/wiki/Downloads)
+
+>To ensure compatibility and the queries run as intended, please make sure you have the versions listed above, or better, installed.
+
+### Installation/Creating the Database
+>To create and connect to the news database to run the quries, download the _newsdata.zip_ file. The zip file contains a _vagrantfile_, which will create the news database and _newsdat.sql_, which contains the database schema and data.
+>
+>Once downloaded, change to the **vagrant** directory from your terminal and start the virtual machine by running the command `vagrant up`. This will cause Vagrant to download the Linux operating system and install it.
+
+>Once `vagrant up` is finished running, you'll be returned to your shell prompt. From here, run `vagrant ssh` to log into the Linux VM install. After logging into your vm, run the command `psql -d news -f newsdata.sql` to load the database's data. Running this command will connect to your installed database server and execute the SQL commands in the downloaded file, creating tables and populating them with data.
 
 >The project also uses two psql custom created views in the third query (_On which days did more than 1% of requests lead to errors?_).
 
@@ -20,4 +34,4 @@
 ### Miscellany
 >A copy of the queries and their output (_logs-analysis-answers.md_) can be found in the repository as well, stating the correct answers to each question.
 
->Make sure to place the _logs-analysis.py_ file in the same directory as your vagrant folder/file and your database file.
+>Make sure to place the _logs-analysis.py_ file in the same directory as your Vagrant folder/file and your database file.
